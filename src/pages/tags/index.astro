@@ -1,0 +1,46 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import TagBadge from '../../components/TagBadge.astro';
+import { getCollection } from 'astro:content';
+
+const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+
+// Count tags
+const tagCounts: Record<string, number> = {};
+allPosts.forEach((post) => {
+  post.data.tags.forEach((tag) => {
+    tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+  });
+});
+
+const sortedTags = Object.entries(tagCounts).sort((a, b) => b[1] - a[1]);
+---
+
+<BaseLayout title="标签" description="按标签浏览文章">
+  <Header />
+
+  <div class="hero-gradient pt-32 pb-16 relative overflow-hidden">
+    <div class="absolute top-20 left-[15%] w-72 h-72 bg-primary-500/15 rounded-full blur-[120px]"></div>
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <h1 class="text-4xl sm:text-5xl font-bold text-white mb-4">🏷️ 标签</h1>
+      <p class="text-lg text-surface-300/80">共 {sortedTags.length} 个标签</p>
+    </div>
+  </div>
+
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div class="glass-card p-10">
+      <div class="flex flex-wrap gap-4">
+        {sortedTags.map(([tag, count]) => (
+          <TagBadge tag={tag} count={count} />
+        ))}
+      </div>
+      {sortedTags.length === 0 && (
+        <p class="text-center text-surface-400 py-8">暂无标签</p>
+      )}
+    </div>
+  </div>
+
+  <Footer />
+</BaseLayout>

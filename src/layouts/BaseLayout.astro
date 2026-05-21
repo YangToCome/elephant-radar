@@ -1,0 +1,150 @@
+---
+export interface Props {
+  title: string;
+  description: string;
+  image?: string;
+  article?: boolean;
+  pubDate?: Date;
+}
+
+const { title, description, image = '/og-default.png', article = false, pubDate } = Astro.props;
+const siteTitle = 'Elephant Radar';
+const fullTitle = title === siteTitle ? title : `${title} | ${siteTitle}`;
+---
+
+<!doctype html>
+<html lang="zh-CN" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={article ? 'article' : 'website'} />
+    <meta property="og:image" content={image} />
+    {article && pubDate && <meta property="article:published_time" content={pubDate.toISOString()} />}
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{fullTitle}</title>
+  </head>
+  <body class="min-h-screen font-sans antialiased">
+    <!-- Particle Canvas (fixed background) -->
+    <canvas id="particle-canvas" class="fixed top-0 left-0 w-full h-full pointer-events-none z-0"></canvas>
+
+    <!-- Reading Progress Bar -->
+    <div id="reading-progress" class="fixed top-0 left-0 h-[3px] bg-gradient-to-r from-primary-500 via-purple-500 to-pink-500 z-[9999] transition-all duration-150" style="width: 0%"></div>
+
+    <slot />
+
+    <script>
+      // ============ Particle System ============
+      (function () {
+        const canvas = document.getElementById('particle-canvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let mouse = { x: -1000, y: -1000 };
+        let w, h;
+
+        function resize() {
+          w = canvas.width = window.innerWidth;
+          h = canvas.height = window.innerHeight;
+        }
+        resize();
+        window.addEventListener('resize', resize);
+
+        window.addEventListener('mousemove', (e) => {
+          mouse.x = e.clientX;
+          mouse.y = e.clientY;
+        });
+        window.addEventListener('mouseleave', () => {
+          mouse.x = -1000;
+          mouse.y = -1000;
+        });
+
+        class Particle {
+          constructor() { this.reset(); }
+          reset() {
+            this.x = Math.random() * w;
+            this.y = Math.random() * h;
+            this.size = Math.random() * 2.5 + 0.5;
+            this.speedX = (Math.random() - 0.5) * 0.4;
+            this.speedY = (Math.random() - 0.5) * 0.4;
+            this.opacity = Math.random() * 0.4 + 0.1;
+            this.color = Math.random() > 0.5 ? '99,102,241' : '168,85,247';
+          }
+          update() {
+            const dx = mouse.x - this.x;
+            const dy = mouse.y - this.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 200) {
+              this.speedX += dx * 0.00003;
+              this.speedY += dy * 0.00003;
+            }
+            this.speedX *= 0.99;
+            this.speedY *= 0.99;
+            this.x += this.speedX;
+            this.y += this.speedY;
+            if (this.x < 0 || this.x > w || this.y < 0 || this.y > h) this.reset();
+          }
+          draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(${this.color}, ${this.opacity})`;
+            ctx.fill();
+          }
+        }
+
+        const count = Math.min(60, Math.floor(w * h / 18000));
+        for (let i = 0; i < count; i++) particles.push(new Particle());
+
+        function connect() {
+          for (let a = 0; a < particles.length; a++) {
+            for (let b = a + 1; b < particles.length; b++) {
+              const dx = particles[a].x - particles[b].x;
+              const dy = particles[a].y - particles[b].y;
+              const dist = dx * dx + dy * dy;
+              if (dist < 10000) {
+                const alpha = (1 - Math.sqrt(dist) / 100) * 0.15;
+                ctx.beginPath();
+                ctx.strokeStyle = `rgba(99,102,241, ${alpha})`;
+                ctx.lineWidth = 0.5;
+                ctx.moveTo(particles[a].x, particles[a].y);
+                ctx.lineTo(particles[b].x, particles[b].y);
+                ctx.stroke();
+              }
+            }
+          }
+        }
+
+        function animate() {
+          ctx.clearRect(0, 0, w, h);
+          particles.forEach((p) => { p.update(); p.draw(); });
+          connect();
+          requestAnimationFrame(animate);
+        }
+        animate();
+      })();
+
+      // ============ Reading Progress ============
+      const progressBar = document.getElementById('reading-progress');
+      if (progressBar) {
+        window.addEventListener('scroll', () => {
+          const scrollTop = window.scrollY;
+          const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+          const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+          progressBar.style.width = `${Math.min(progress, 100)}%`;
+        });
+      }
+
+      // ============ Dark Mode Init ============
+      const theme = localStorage.getItem('theme') ||
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.classList.toggle('dark', theme === 'dark');
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  @import '../styles/global.css';
+</style>

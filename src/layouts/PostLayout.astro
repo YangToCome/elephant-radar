@@ -1,0 +1,83 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import TOC from '../components/TOC.astro';
+import TagBadge from '../components/TagBadge.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  pubDate: Date;
+  updatedDate?: Date;
+  heroImage?: string;
+  tags?: string[];
+  category?: string;
+}
+
+const { title, description, pubDate, updatedDate, heroImage, tags = [], category = '技术' } = Astro.props;
+
+const formattedDate = pubDate.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
+const formattedUpdated = updatedDate?.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
+---
+
+<BaseLayout title={title} description={description} image={heroImage} article={true} pubDate={pubDate}>
+  <!-- Article Hero Background -->
+  <div class="hero-gradient min-h-[40vh] flex items-end relative overflow-hidden">
+    <!-- Floating orbs -->
+    <div class="absolute top-20 left-[10%] w-64 h-64 bg-primary-500/20 rounded-full blur-[100px] animate-float"></div>
+    <div class="absolute top-40 right-[15%] w-48 h-48 bg-purple-500/20 rounded-full blur-[80px] animate-float-delay"></div>
+    <div class="absolute bottom-20 left-[40%] w-56 h-56 bg-pink-500/15 rounded-full blur-[90px] animate-float-slow"></div>
+    
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 pb-16 pt-32 relative z-10">
+      <div class="max-w-3xl animate-slide-up">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="glass px-3 py-1 rounded-full text-xs font-medium text-primary-300">
+            {category}
+          </span>
+          <time datetime={pubDate.toISOString()} class="text-surface-400 text-sm">
+            {formattedDate}
+          </time>
+        </div>
+        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 text-balance leading-tight">
+          {title}
+        </h1>
+        <p class="text-lg text-surface-300/80 leading-relaxed">
+          {description}
+        </p>
+        {tags.length > 0 && (
+          <div class="flex flex-wrap gap-2 mt-6">
+            {tags.map((tag) => (
+              <TagBadge tag={tag} />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+
+  <!-- Article Content -->
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="flex gap-12 max-w-7xl mx-auto">
+      <!-- Main Content -->
+      <article class="flex-1 min-w-0 max-w-3xl animate-fade-in">
+        {heroImage && (
+          <img src={heroImage} alt={title} class="w-full rounded-2xl shadow-2xl mb-8 -mt-8 relative z-20" />
+        )}
+        <div class="prose-custom">
+          <slot />
+        </div>
+        {updatedDate && (
+          <div class="mt-12 pt-6 border-t border-primary-500/10 text-sm text-surface-400">
+            最后更新于 {formattedUpdated}
+          </div>
+        )}
+      </article>
+
+      <!-- Sidebar: TOC -->
+      <aside class="hidden xl:block w-64 shrink-0">
+        <div class="sticky top-24">
+          <TOC />
+        </div>
+      </aside>
+    </div>
+  </div>
+</BaseLayout>

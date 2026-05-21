@@ -1,0 +1,64 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<BaseLayout title="关于" description="了解 DevVerse 博客">
+  <Header />
+
+  <div class="hero-gradient pt-32 pb-16 relative overflow-hidden">
+    <div class="absolute top-20 left-[20%] w-72 h-72 bg-primary-500/15 rounded-full blur-[120px]"></div>
+    <div class="absolute bottom-10 right-[15%] w-56 h-56 bg-pink-500/15 rounded-full blur-[100px]"></div>
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <h1 class="text-4xl sm:text-5xl font-bold text-white mb-4">👋 关于�?/h1>
+      <p class="text-lg text-surface-300/80">一个热爱技术的开发�?/p>
+    </div>
+  </div>
+
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-16 max-w-3xl">
+    <div class="prose-custom">
+      <h2>关于这个博客</h2>
+      <p>
+        DevVerse 是一个专注于技术分享的个人博客。在这里，我会记录前端、后端、架构设计以�?AI 领域的学习笔记和实践经验�?      </p>
+      <p>
+        博客使用 <a href="https://astro.build" target="_blank">Astro</a> 构建�?        样式基于 <a href="https://tailwindcss.com" target="_blank">Tailwind CSS</a>�?        采用玻璃拟态（Glassmorphism）设计风格�?      </p>
+
+      <h2>技术栈</h2>
+      <ul>
+        <li>前端框架：React / Vue / Svelte</li>
+        <li>语言：TypeScript / JavaScript / Go</li>
+        <li>样式方案：Tailwind CSS / CSS Modules</li>
+        <li>构建工具：Vite / Webpack / Astro</li>
+        <li>后端：Node.js / Python</li>
+        <li>数据库：PostgreSQL / MongoDB / Redis</li>
+      </ul>
+
+      <h2>如何写文�?/h2>
+      <p>
+        �?<code>src/content/blog/</code> 目录下创�?<code>.md</code> �?<code>.mdx</code> 文件即可�?        文件头部需要添�?frontmatter�?      </p>
+      <blockquote>
+        <pre><code>---
+title: 你的文章标题
+description: 文章简短描�?pubDate: 2026-05-21
+tags: [标签1, 标签2]
+category: 分类�?featured: false
+draft: false
+---
+
+文章正文（支�?Markdown / MDX�?/code></pre>
+      </blockquote>
+
+      <h2>联系�?/h2>
+      <p>
+        欢迎通过以下方式联系我交流技术：
+      </p>
+      <ul>
+        <li>GitHub: <a href="https://github.com" target="_blank">@yourusername</a></li>
+        <li>Email: your@email.com</li>
+      </ul>
+    </div>
+  </div>
+
+  <Footer />
+</BaseLayout>

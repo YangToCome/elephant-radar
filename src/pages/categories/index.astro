@@ -1,0 +1,61 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { getCollection } from 'astro:content';
+
+const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+
+// Group by category
+const categoryMap: Record<string, typeof allPosts> = {};
+allPosts.forEach((post) => {
+  const cat = post.data.category;
+  if (!categoryMap[cat]) categoryMap[cat] = [];
+  categoryMap[cat].push(post);
+});
+
+// Sort each category's posts
+Object.keys(categoryMap).forEach((cat) => {
+  categoryMap[cat].sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+});
+
+const categories = Object.entries(categoryMap).sort((a, b) => b[1].length - a[1].length);
+---
+
+<BaseLayout title="分类" description="按分类浏览文章">
+  <Header />
+
+  <div class="hero-gradient pt-32 pb-16 relative overflow-hidden">
+    <div class="absolute top-20 right-[10%] w-80 h-80 bg-purple-500/15 rounded-full blur-[130px]"></div>
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <h1 class="text-4xl sm:text-5xl font-bold text-white mb-4">📂 分类</h1>
+      <p class="text-lg text-surface-300/80">共 {categories.length} 个分类</p>
+    </div>
+  </div>
+
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {categories.map(([category, posts]) => (
+        <a href={`/categories/${category}`} class="group glass-card p-8 text-center">
+          <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-primary-500/20 to-purple-500/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+            <svg class="w-8 h-8 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-bold text-surface-800 dark:text-white mb-2 group-hover:text-primary-500 transition-colors">
+            {category}
+          </h3>
+          <p class="text-sm text-surface-400">{posts.length} 篇文章</p>
+        </a>
+      ))}
+    </div>
+
+    {categories.length === 0 && (
+      <div class="text-center py-20">
+        <p class="text-surface-400">暂无分类</p>
+      </div>
+    )}
+  </div>
+
+  <Footer />
+</BaseLayout>

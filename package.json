@@ -1,0 +1,22 @@
+{
+    "name": "astro-tech-blog",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "astro": "astro",
+        "preview": "astro preview",
+        "build": "astro build",
+        "dev": "astro dev"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@astrojs/mdx": "^5.0.6",
+        "@astrojs/sitemap": "^3.7.2",
+        "@tailwindcss/vite": "^4.3.0",
+        "astro": "^6.3.6",
+        "tailwindcss": "^4.3.0"
+    }
+}
